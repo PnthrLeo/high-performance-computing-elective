@@ -1,0 +1,10 @@
+# Ignore folder .vscode
+.vscode
+
+# Ignore folder .vscode
+.ssh
+
+# Ignore folder lection2
+lection2
+#ignore folder test
+test
