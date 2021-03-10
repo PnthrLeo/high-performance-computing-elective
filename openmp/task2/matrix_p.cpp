@@ -14,8 +14,8 @@ std::vector<std::vector<int>> generate_matrix(int n, int m, int range=1e+9, int 
 
     std::vector<std::vector<int>> mat(n, std::vector<int>(m));
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
             mat[i][j] = gen()*range;
         }
     }
@@ -30,7 +30,7 @@ std::vector<int> find_min_in_rows(std::vector<std::vector<int>> &mat) {
 
     omp_set_num_threads(8);
     #pragma omp parallel for
-    for(int i = 0; i < n; i++){
+    for(int i = 0; i < n; i++) {
         mins[i] = *std::min_element(mat[i].begin(), mat[i].end());
     }
 
@@ -42,8 +42,7 @@ int find_max(std::vector<int> &arr) {
     int max = arr[0];
 
     #pragma omp parallel for reduction(max: max)
-    for (int i = 0; i < arr.size(); i++)
-    {
+    for (int i = 0; i < arr.size(); i++) {
         if (arr[i] > max)
             max = arr[i];
     }
