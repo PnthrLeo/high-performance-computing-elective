@@ -11,7 +11,7 @@ void simpsonIntegral(double a, double b, int n, const std::function<double (doub
 
     omp_set_num_threads(8);
     #pragma omp parallel for reduction(+ : simpson_integral)
-    for(int step = 0; step < n; step++) {
+    for (int step = 0; step < n; step++) {
         const double x1 = a + step*width;
         const double x2 = a + (step+1)*width;
 

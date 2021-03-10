@@ -1,3 +1,4 @@
+#include <omp.h>
 #include <iostream>
 #include <vector>
 #include <random>
@@ -39,9 +40,21 @@ std::vector<int> generate_array(int m, int range=1e+9, int seed=42) {
 std::vector<int> mult_mat_arr(std::vector<std::vector<int>> &mat, std::vector<int> &arr) {
     std::vector<int> res(mat.size(), 0);
     
-    for (int i = 0; i < mat.size(); i++) {
+    #pragma omp parallel
+    {
+        std::vector<int> res_thread(mat.size(), 0);
+        
+        #pragma omp for
         for (int j = 0; j < arr.size(); j++) {
-            res[i] += mat[i][j] * arr[j];
+            for (int i = 0; i < mat.size(); i++) {
+                res_thread[i] += mat[i][j] * arr[j];
+            }
+        }
+        #pragma omp critical
+        {
+            for (int i = 0; i < arr.size(); i++) {
+                res[i] += res_thread[i];
+            }
         }
     }
 

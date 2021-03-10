@@ -9,7 +9,7 @@ double simpsonIntegral(double a, double b, int n, const std::function<double (do
     const double width = (b-a)/n;
 
     double simpson_integral = 0;
-    for(int step = 0; step < n; step++) {
+    for (int step = 0; step < n; step++) {
         const double x1 = a + step*width;
         const double x2 = a + (step+1)*width;
 
