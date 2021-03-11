@@ -1,3 +1,4 @@
+#include <omp.h>
 #include <iostream>
 #include <vector>
 #include <random>
@@ -36,13 +37,46 @@ std::vector<int> generate_array(int m, int range=1e+9, int seed=42) {
 }
 
 
+void mult_block_arr(std::vector<std::vector<int>> &mat, std::vector<int> &arr, std::vector<int> &res, int thread_num) {
+    int row_step, col_step;
+    int left, right, top, bottom;
+
+    if (arr.size() > mat.size()){
+        row_step = arr.size() / omp_get_max_threads() * 2;
+        col_step = mat.size() / 2;
+        left = row_step*(thread_num / 2);
+        right = left + row_step;
+        top = col_step*(thread_num % 2);
+        bottom = top + col_step;
+    }
+    else {
+        row_step = arr.size() / 2;
+        col_step = mat.size() / omp_get_max_threads() * 2;
+        left = row_step*(thread_num % 2);
+        right = left + row_step;
+        top = col_step*(thread_num / 2);
+        bottom = top + col_step;
+    }
+
+    int temp = 0;
+
+    for (int i = top; i < bottom; i++) {
+        temp = 0;
+        for (int j = left; j < right; j++) {
+            temp += mat[i][j] * arr[j];
+        }
+        #pragma omp atomic
+        res[i] += temp;
+    }
+}
+
+
 std::vector<int> mult_mat_arr(std::vector<std::vector<int>> &mat, std::vector<int> &arr) {
     std::vector<int> res(mat.size(), 0);
-    
-    for (int i = 0; i < mat.size(); i++) {
-        for (int j = 0; j < arr.size(); j++) {
-            res[i] += mat[i][j] * arr[j];
-        }
+
+    #pragma omp parallel
+    {
+        mult_block_arr(mat, arr, res, omp_get_thread_num());
     }
 
     return res;
