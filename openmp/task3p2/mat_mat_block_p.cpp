@@ -71,31 +71,39 @@ std::vector<std::vector<int>> mult_mat_mat(std::vector<std::vector<int>> &mat1, 
 }
 
 
-int main(){
-    int n, m;
-    std::cin >> n >> m;
-    std::vector<std::vector<int>> mat1 = generate_matrix(n, m, 1e+4);
-    std::vector<std::vector<int>> mat2 = generate_matrix(m, n, 1e+4);
+void run_test(int n, int m, int iters) {
+    clock_t cpu_time = 0;
+    double real_time = 0;
 
-    std::clock_t c_start = std::clock();
-    auto t_start = std::chrono::high_resolution_clock::now();
+    for (int i = 0 ; i < iters; i++) {
+        std::vector<std::vector<int>> mat1 = generate_matrix(n, m, 1e+4, i);
+        std::vector<std::vector<int>> mat2 = generate_matrix(m, n, 1e+4, i);
 
-    std::vector<std::vector<int>> res = mult_mat_mat(mat1, mat2);
+        std::clock_t c_start = std::clock();
+        auto t_start = std::chrono::high_resolution_clock::now();
 
-    std::clock_t c_end = std::clock();
-    auto t_end = std::chrono::high_resolution_clock::now();
+        std::vector<std::vector<int>> res = mult_mat_mat(mat1, mat2);
 
-    std::cout << std::fixed << std::setprecision(8);
-    std::cout << "result: " << std::endl;
-    for (int i = 0; i < res.size(); i++) {
-        for (int j = 0; j < res.size(); j++) {
-            std::cout << res[i][j] << " ";
-        }
-        std::cout << std::endl;
+        std::clock_t c_end = std::clock();
+        auto t_end = std::chrono::high_resolution_clock::now();
+
+        cpu_time += (c_end - c_start);
+        real_time += std::chrono::duration<double, std::milli>(t_end-t_start).count();
     }
-    std::cout << std::endl;
-    std::cout << "CPU time used: " << 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC << " ms" << std::endl;
-    std::cout << "Wall clock time passed: " << std::chrono::duration<double, std::milli>(t_end-t_start).count() << " ms" << std::endl;
 
+    std::cout << "Result for matrix of size " << n << "x" << m << " with mean by " << iters << " iterations" << std::endl;
+    std::cout << "---CPU time used: " << 1000.0 * cpu_time / iters / CLOCKS_PER_SEC << " ms" << std::endl;
+    std::cout << "---Wall clock time passed: " << real_time / iters << " ms" << std::endl;
+}
+
+
+int main() {
+    std::cout << std::endl;
+    std::cout << "--- Number of threads: " << omp_get_max_threads() << " ---"<< std::endl;
+    run_test(100, 100, 10);
+    run_test(200, 200, 10);
+    run_test(400, 400, 10);
+    run_test(600, 600, 10);
+    run_test(800, 800, 10);
     return 0;
 }
