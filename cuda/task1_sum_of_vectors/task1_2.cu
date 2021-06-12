@@ -3,7 +3,7 @@
 #include "math.h"
 
 #define N 100000
-#define BLOCK_SIZE 16
+#define BLOCK_SIZE 1024
 #define MAX_ERR 1e-6
 
 __global__ void add(int *a, int *b, int *c, int n) {
