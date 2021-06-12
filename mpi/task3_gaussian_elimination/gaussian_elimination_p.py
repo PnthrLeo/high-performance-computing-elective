@@ -1,7 +1,7 @@
 import warnings
 
-from mpi4py import MPI
 import numpy as np
+from mpi4py import MPI
 
 
 def swap_rows(mat: np.matrix, row_1: int, row_2: int) -> np.matrix:
