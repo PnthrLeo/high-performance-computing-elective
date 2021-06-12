@@ -3,14 +3,16 @@
 #include "math.h"
 
 #define N 100000
-#define GRID_SIZE 1024
+#define BLOCK_SIZE 128
+#define GRID_SIZE 128
 #define MAX_ERR 1e-6
 
 __global__ void add(int *a, int *b, int *c, int n) {
     int tid = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (tid < n){
+    while (tid < n) {
         c[tid] = a[tid] + b[tid];
+        tid += blockDim.x * gridDim.x;
     }
 }
 
@@ -39,7 +41,7 @@ int main() {
     cudaMemcpy(d_b, b, sizeof(int) * N, cudaMemcpyHostToDevice);
 
     // Executing kernel 
-    add<<<(N + GRID_SIZE)/GRID_SIZE , GRID_SIZE>>>(d_a, d_b, d_c, N);
+    add<<<BLOCK_SIZE, GRID_SIZE>>>(d_a, d_b, d_c, N);
 	
 	// Transfer data back to host memory
     cudaMemcpy(c, d_c, sizeof(int) * N, cudaMemcpyDeviceToHost);
