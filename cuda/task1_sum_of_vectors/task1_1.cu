@@ -18,7 +18,7 @@ int main() {
 	int *d_a, *d_b, *d_c;
 
     // Initialize host arrays
-    for (int i=0; i<N; i++) {
+    for (int i = 0; i < N; i++) {
         a[i] = -i;
         b[i] = i * i;
     }
@@ -43,7 +43,7 @@ int main() {
     cudaMemcpy(c, d_c, sizeof(int) * N, cudaMemcpyDeviceToHost);
 
     // Verification
-    for(int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++) {
         assert(abs(c[i] - a[i] - b[i]) < MAX_ERR);
     }
 	
@@ -64,7 +64,7 @@ int main() {
     cudaMemcpy(c, d_c, sizeof(int) * N, cudaMemcpyDeviceToHost);
 
     // Verification
-    for(int i = 0; i < N; i++){
+    for (int i = 0; i < N; i++) {
         assert(abs(c[i] - a[i] - b[i]) < MAX_ERR);
     }
 	

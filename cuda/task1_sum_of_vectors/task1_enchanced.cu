@@ -21,12 +21,12 @@ int main() {
 	int *d_a, *d_b, *d_c;
 	
 	// Allocate host memory
-    a   = (int*)malloc(sizeof(int) * N);
-    b   = (int*)malloc(sizeof(int) * N);
+    a = (int*)malloc(sizeof(int) * N);
+    b = (int*)malloc(sizeof(int) * N);
     c = (int*)malloc(sizeof(int) * N);
 	
     // Initialize host arrays
-    for (int i=0; i<N; i++) {
+    for (int i = 0; i < N; i++) {
         a[i] = -i;
         b[i] = i * i;
     }
@@ -41,18 +41,23 @@ int main() {
     cudaMemcpy(d_b, b, sizeof(int) * N, cudaMemcpyHostToDevice);
 
     // Executing kernel 
-    add<<<BLOCK_SIZE, GRID_SIZE>>>(d_a, d_b, d_c, N);
+    add<<<GRID_SIZE, BLOCK_SIZE>>>(d_a, d_b, d_c, N);
 	
 	// Transfer data back to host memory
     cudaMemcpy(c, d_c, sizeof(int) * N, cudaMemcpyDeviceToHost);
 
     // Verification
-    for(int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++) {
         assert(abs(c[i] - a[i] - b[i]) < MAX_ERR);
     }
 	
 	printf("PASSED\n");
 	
+    // Deallocate host memory
+    free(a);
+    free(b);
+    free(c);
+
 	// Deallocate device memory
     cudaFree(d_a);
     cudaFree(d_b);
