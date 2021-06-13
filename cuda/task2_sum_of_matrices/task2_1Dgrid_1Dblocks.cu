@@ -10,12 +10,15 @@
 __global__ void sum_matrix_on_gpu(int *mat_a, int *mat_b, int *mat_c, int nx, int ny)
 {
     unsigned int ix = threadIdx.x + blockIdx.x * blockDim.x;
-    unsigned int iy = threadIdx.y + blockIdx.y * blockDim.y;
-    unsigned int idx = iy * nx + ix;
+    unsigned int idx = 0;
 
-    if (ix < nx && iy < ny)
+    if (ix < nx)
     {
-        mat_c[idx] = mat_a[idx] + mat_b[idx];
+        for (int iy = 0; iy < ny; iy++)
+        {
+            idx = iy * nx + ix;
+            mat_c[idx] = mat_a[idx] + mat_b[idx];
+        }
     }
 }
 
@@ -82,8 +85,8 @@ int main()
     cudaMemcpy(d_b, b[0], sizeof(int) * nx * ny, cudaMemcpyHostToDevice);
 
     // Set kernel configuration
-    dim3 block(16, 16);
-    dim3 grid((nx + block.x) / block.x, (ny + block.y) / block.y);
+    dim3 block(128, 1);
+    dim3 grid((nx + block.x) / block.x, 1);
 
     // Executing kernel
     std::chrono::high_resolution_clock::time_point start_time = get_time_in_milliseconds();
