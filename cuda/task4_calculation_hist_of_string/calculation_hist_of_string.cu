@@ -15,21 +15,24 @@ __global__ void calculate_hist(unsigned char *str, int str_length, int *hist)
     int tid_local = threadIdx.x;
 
     // init local histogram
-    if (tid_local < HIST_SIZE) {
+    if (tid_local < HIST_SIZE)
+    {
         loc_hist[tid_local] = 0;
     }
 
     __syncthreads();
 
     // count symbol in local histogram
-    if (tid < str_length) {
+    if (tid < str_length)
+    {
         atomicAdd(&loc_hist[str[tid]], 1);
     }
 
     __syncthreads();
 
     // send counts to global histrogram
-    if (tid_local < HIST_SIZE) {
+    if (tid_local < HIST_SIZE)
+    {
         atomicAdd(&hist[tid_local], loc_hist[tid_local]);
     }
 }
@@ -49,29 +52,33 @@ unsigned char *generate_random_string(unsigned int length)
 int *init_hist()
 {
     int *hist = (int *)malloc(sizeof(int) * HIST_SIZE);
-    
-    for (int i = 0; i < HIST_SIZE; i++) {
+
+    for (int i = 0; i < HIST_SIZE; i++)
+    {
         hist[i] = 0;
     }
 
     return hist;
 }
 
-void generate_kernel_config(int length_of_str, int *grid_size, int *block_size) 
-{   
+void generate_kernel_config(int length_of_str, int *grid_size, int *block_size)
+{
     cudaDeviceProp device;
     cudaGetDeviceProperties(&device, 0);
     int max_threads_per_block = device.maxThreadsPerBlock;
 
-    if (length_of_str / max_threads_per_block > 0) {
+    if (length_of_str / max_threads_per_block > 0)
+    {
         *grid_size = length_of_str / max_threads_per_block + 1;
         *block_size = max_threads_per_block;
     }
-    else if (length_of_str < 256) {
+    else if (length_of_str < 256)
+    {
         *grid_size = 1;
         *block_size = 256;
     }
-    else {
+    else
+    {
         *grid_size = 1;
         *block_size = length_of_str;
     }
@@ -98,18 +105,22 @@ void verify(unsigned char *str, unsigned int length, int *hist)
     }
 }
 
-#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+#define gpuErrchk(ans)                        \
+    {                                         \
+        gpuAssert((ans), __FILE__, __LINE__); \
+    }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort = true)
 {
-   if (code != cudaSuccess) 
-   {
-      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
-      if (abort) exit(code);
-   }
+    if (code != cudaSuccess)
+    {
+        fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+        if (abort)
+            exit(code);
+    }
 }
 
 int main()
-{   
+{
     int grid_size, block_size;
     unsigned char *str, *d_str;
     int *hist, *d_hist;
